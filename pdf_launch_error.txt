@@ -1,0 +1,4 @@
+Error: The browser is already running for C:\Users\RAKA\AppData\Local\Temp\puppeteer_dev_chrome_profile-Sx2K1e. Use a different `userDataDir` or stop the running browser first.
+    at ChromeLauncher.launch (C:\Users\RAKA\OneDrive\Desktop\imp\AI Startup Builder\node_modules\puppeteer-core\lib\cjs\puppeteer\node\BrowserLauncher.js:175:23)
+    at async PremiumPDFGenerator.initialize (C:\Users\RAKA\OneDrive\Desktop\imp\AI Startup Builder\src\services\premiumPDFGenerator.js:21:24)
+    at async C:\Users\RAKA\OneDrive\Desktop\imp\AI Startup Builder\src\server.js:283:5

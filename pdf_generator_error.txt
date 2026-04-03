@@ -1,0 +1,11 @@
+TimeoutError: Timed out after waiting 30000ms
+    at C:\Users\RAKA\OneDrive\Desktop\imp\AI Startup Builder\node_modules\puppeteer-core\lib\cjs\puppeteer\common\util.js:246:19
+    at C:\Users\RAKA\OneDrive\Desktop\imp\AI Startup Builder\node_modules\puppeteer-core\lib\cjs\third_party\rxjs\rxjs.js:3991:35
+    at OperatorSubscriber2._this._next (C:\Users\RAKA\OneDrive\Desktop\imp\AI Startup Builder\node_modules\puppeteer-core\lib\cjs\third_party\rxjs\rxjs.js:1055:13)
+    at Subscriber2.next (C:\Users\RAKA\OneDrive\Desktop\imp\AI Startup Builder\node_modules\puppeteer-core\lib\cjs\third_party\rxjs\rxjs.js:678:16)
+    at AsyncAction2.<anonymous> (C:\Users\RAKA\OneDrive\Desktop\imp\AI Startup Builder\node_modules\puppeteer-core\lib\cjs\third_party\rxjs\rxjs.js:4868:24)
+    at AsyncAction2._execute (C:\Users\RAKA\OneDrive\Desktop\imp\AI Startup Builder\node_modules\puppeteer-core\lib\cjs\third_party\rxjs\rxjs.js:1974:16)
+    at AsyncAction2.execute (C:\Users\RAKA\OneDrive\Desktop\imp\AI Startup Builder\node_modules\puppeteer-core\lib\cjs\third_party\rxjs\rxjs.js:1963:26)
+    at AsyncScheduler2.flush (C:\Users\RAKA\OneDrive\Desktop\imp\AI Startup Builder\node_modules\puppeteer-core\lib\cjs\third_party\rxjs\rxjs.js:2235:30)
+    at listOnTimeout (node:internal/timers:588:17)
+    at process.processTimers (node:internal/timers:523:7)

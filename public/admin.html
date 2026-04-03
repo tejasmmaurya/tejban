@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TejBan — Admin Dashboard</title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <style>
+      :root {
+        --bg: #f2efe9;
+        --surface: #fffaf0;
+        --ink: #1b1d29;
+        --accent: #0a7f5a;
+        --accent-light: #e9f4ef;
+        --muted: #5d5f6b;
+        --line: #d9d3c4;
+        --danger: #b91c1c;
+        --warn: #92400e;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: "Space Grotesk", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top right, #f7d7bf 0%, var(--bg) 40%),
+          radial-gradient(circle at bottom left, #cfe6dd 0%, transparent 45%),
+          var(--bg);
+        min-height: 100vh;
+      }
+
+      a { color: var(--accent); }
+
+      .container {
+        width: min(1120px, 95vw);
+        margin: 0 auto;
+        padding: 28px 0 64px;
+      }
+
+      /* ── Header ── */
+      .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        padding-bottom: 22px;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+      }
+
+      .admin-header h1 {
+        margin: 0 0 4px;
+        font-size: 1.7rem;
+      }
+
+      .admin-header .sub {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .header-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .model-tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 12px;
+        border-radius: 999px;
+        background: var(--accent-light);
+        color: #0a5c41;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+      }
+
+      /* ── Buttons ── */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 40px;
+        padding: 0 18px;
+        border-radius: 999px;
+        font: 600 0.88rem "Space Grotesk", sans-serif;
+        cursor: pointer;
+        border: 1px solid transparent;
+        text-decoration: none;
+        transition: opacity 120ms;
+      }
+
+      .btn:hover { opacity: 0.82; }
+      .btn:disabled { opacity: 0.4; cursor: default; }
+
+      .btn-primary { background: var(--accent); color: #fff; }
+      .btn-outline { background: #fff; border-color: var(--line); color: var(--ink); }
+      .btn-danger { background: #fee2e2; border-color: #fca5a5; color: var(--danger); }
+
+      /* ── Cards / Sections ── */
+      .section {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin-bottom: 20px;
+      }
+
+      .section-title {
+        margin: 0 0 16px;
+        font-size: 1rem;
+        font-weight: 700;
+      }
+
+      /* ── Stats grid ── */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+      }
+
+      .stat-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 18px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .stat-card.accent {
+        border-color: color-mix(in srgb, var(--accent) 30%, var(--line));
+        background: var(--accent-light);
+      }
+
+      .stat-label {
+        font-size: 0.73rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+      }
+
+      .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: 1;
+        color: var(--ink);
+      }
+
+      .stat-card.accent .stat-value { color: var(--accent); }
+
+      .stat-sub {
+        font-size: 0.78rem;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+
+      /* ── Charts ── */
+      .charts-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+
+      .chart-wrap {
+        position: relative;
+        height: 230px;
+      }
+
+      /* ── Deploy ── */
+      .deploy-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+
+      .deploy-card {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .deploy-card h3 { margin: 0; font-size: 1rem; }
+      .deploy-card p { margin: 0; font-size: 0.85rem; color: var(--muted); }
+
+      .deploy-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .status-badge {
+        display: inline-flex;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+      }
+
+      .badge-ok { background: #dcfce7; color: #14532d; }
+      .badge-missing { background: #fee2e2; color: #7f1d1d; }
+      .badge-pending { background: #fef9c3; color: #713f12; }
+
+      .deploy-result {
+        font-size: 0.82rem;
+        margin-top: 2px;
+      }
+
+      /* ── Activity table ── */
+      .activity-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.87rem;
+      }
+
+      .activity-table th {
+        text-align: left;
+        padding: 7px 10px;
+        color: var(--muted);
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        border-bottom: 2px solid var(--line);
+      }
+
+      .activity-table td {
+        padding: 9px 10px;
+        border-bottom: 1px solid var(--line);
+        max-width: 260px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .activity-table tr:last-child td { border-bottom: 0; }
+      .activity-table tr:hover td { background: #f9f6f0; }
+
+      /* ── Misc ── */
+      .row-between {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .error-msg {
+        background: #fee2e2;
+        border: 1px solid #fca5a5;
+        border-radius: 12px;
+        padding: 14px 18px;
+        color: var(--danger);
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+      }
+
+      .warn-msg {
+        background: #fff7ed;
+        border: 1px solid #fdba74;
+        border-radius: 12px;
+        padding: 14px 18px;
+        color: var(--warn);
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+      }
+
+      .loading-pulse {
+        color: var(--muted);
+        font-size: 0.9rem;
+        padding: 10px 0;
+      }
+
+      .refresh-note {
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+
+      .footer {
+        text-align: center;
+        padding-top: 24px;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      .footer a { font-weight: 700; text-decoration: none; }
+      .footer a:hover { text-decoration: underline; }
+
+      /* ── Responsive ── */
+      @media (max-width: 720px) {
+        .charts-row { grid-template-columns: 1fr; }
+        .deploy-grid { grid-template-columns: 1fr; }
+        .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      }
+
+      @media (max-width: 480px) {
+        .stats-grid { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+
+      <!-- Header -->
+      <header class="admin-header">
+        <div>
+          <h1>Admin Dashboard</h1>
+          <p class="sub">TejBan platform metrics, deployment controls, and usage stats</p>
+        </div>
+        <div class="header-actions">
+          <span id="modelTag" class="model-tag" hidden></span>
+          <button id="refreshBtn" class="btn btn-outline" type="button">↻ Refresh</button>
+          <button id="logoutBtn" class="btn btn-danger" type="button">Logout</button>
+          <a class="btn btn-outline" href="/">← Back to App</a>
+        </div>
+      </header>
+
+      <!-- Error banner -->
+      <div id="errorBanner" class="error-msg" hidden></div>
+      <div id="warnBanner" class="warn-msg" hidden></div>
+
+      <!-- Loading -->
+      <p id="loadingMsg" class="loading-pulse">Loading stats…</p>
+
+      <!-- Stats grid -->
+      <div id="statsGrid" class="stats-grid" hidden>
+        <div class="stat-card accent">
+          <span class="stat-label">Total Projects (DB)</span>
+          <span class="stat-value" id="totalProjects">—</span>
+          <span class="stat-sub">Saved to Supabase</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">This Week</span>
+          <span class="stat-value" id="weekProjects">—</span>
+          <span class="stat-sub">Last 7 days (DB)</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">This Month</span>
+          <span class="stat-value" id="monthProjects">—</span>
+          <span class="stat-sub">Last 30 days (DB)</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Blueprints Generated</span>
+          <span class="stat-value" id="localBlueprints">—</span>
+          <span class="stat-sub">This browser (local)</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Landing Codes</span>
+          <span class="stat-value" id="localLanding">—</span>
+          <span class="stat-sub">Generated (local)</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Sessions</span>
+          <span class="stat-value" id="localSessions">—</span>
+          <span class="stat-sub">Browser sessions (local)</span>
+        </div>
+        <div class="stat-card accent">
+          <span class="stat-label">Time on Site</span>
+          <span class="stat-value" id="localTime">—</span>
+          <span class="stat-sub">Total across sessions</span>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div id="chartsRow" class="charts-row" hidden>
+        <div class="section">
+          <div class="row-between" style="margin-bottom:14px;">
+            <h2 class="section-title" style="margin:0;">Blueprint Activity — Last 14 Days</h2>
+            <span class="refresh-note">Supabase saves</span>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="activityChart"></canvas>
+          </div>
+        </div>
+        <div class="section">
+          <div class="row-between" style="margin-bottom:14px;">
+            <h2 class="section-title" style="margin:0;">Generation Breakdown</h2>
+            <span class="refresh-note">Local + DB</span>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="breakdownChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Deploy -->
+      <div id="deploySection" class="section" hidden>
+        <h2 class="section-title">Deployment</h2>
+        <div class="deploy-grid">
+
+          <div class="deploy-card">
+            <div class="deploy-row">
+              <h3>Netlify</h3>
+              <span id="netlifyStatus" class="status-badge badge-missing">Not configured</span>
+            </div>
+            <p>Trigger a Netlify deploy hook to rebuild and publish your site.</p>
+            <div class="deploy-row">
+              <button id="deployNetlifyBtn" class="btn btn-primary" type="button" disabled>Deploy to Netlify</button>
+              <span id="netlifyResult" class="deploy-result"></span>
+            </div>
+          </div>
+
+          <div class="deploy-card">
+            <div class="deploy-row">
+              <h3>Vercel</h3>
+              <span id="vercelStatus" class="status-badge badge-missing">Not configured</span>
+            </div>
+            <p>Trigger a Vercel deploy hook to push your latest changes live.</p>
+            <div class="deploy-row">
+              <button id="deployVercelBtn" class="btn btn-primary" type="button" disabled>Deploy to Vercel</button>
+              <span id="vercelResult" class="deploy-result"></span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Recent projects -->
+      <div id="recentSection" class="section" hidden>
+        <h2 class="section-title">Recent Projects (DB)</h2>
+        <div style="overflow-x:auto;">
+          <table class="activity-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Startup Idea</th>
+                <th>Industry</th>
+                <th>Country</th>
+                <th>Budget</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="recentBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <footer class="footer">
+        TejBan Admin ·
+        Powered by <a href="https://tejasdevelopers.netlify.app" target="_blank" rel="noopener noreferrer">Tejas Developers</a>
+      </footer>
+    </div>
+
+    <script>
+      const STATS_KEY = "tejban:stats";
+
+      function getLocalStats() {
+        try {
+          const raw = localStorage.getItem(STATS_KEY);
+          return raw ? JSON.parse(raw) : {};
+        } catch {
+          return {};
+        }
+      }
+
+      function fmtTime(ms) {
+        if (!ms || ms < 1000) return "< 1m";
+        const mins = Math.floor(ms / 60000);
+        if (mins < 60) return `${mins}m`;
+        return `${(ms / 3600000).toFixed(1)}h`;
+      }
+
+      function escHtml(str) {
+        return String(str || "—")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      let actChart = null;
+      let brkChart = null;
+
+      async function loadStats() {
+        const loadingMsg = document.getElementById("loadingMsg");
+        const errorBanner = document.getElementById("errorBanner");
+        const warnBanner = document.getElementById("warnBanner");
+        const statsGrid = document.getElementById("statsGrid");
+        const chartsRow = document.getElementById("chartsRow");
+        const deploySection = document.getElementById("deploySection");
+        const recentSection = document.getElementById("recentSection");
+
+        loadingMsg.hidden = false;
+        statsGrid.hidden = true;
+        chartsRow.hidden = true;
+        deploySection.hidden = true;
+        recentSection.hidden = true;
+        errorBanner.hidden = true;
+        warnBanner.hidden = true;
+
+        try {
+          const res = await fetch("/api/admin/stats");
+          if (res.status === 401) {
+            window.location.href = "/admin-login.html";
+            return;
+          }
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || err.message || `HTTP ${res.status}`);
+          }
+          const data = await res.json();
+
+          if (data.statsWarning) {
+            warnBanner.textContent = data.statsWarning;
+            warnBanner.hidden = false;
+          }
+
+          // Model badge
+          const modelTag = document.getElementById("modelTag");
+          if (data.geminiModel) {
+            modelTag.textContent = data.geminiModel;
+            modelTag.hidden = false;
+          }
+
+          // DB stats
+          document.getElementById("totalProjects").textContent = data.totalProjects ?? 0;
+          document.getElementById("weekProjects").textContent = data.projectsThisWeek ?? 0;
+          document.getElementById("monthProjects").textContent = data.projectsThisMonth ?? 0;
+
+          // Local stats
+          const local = getLocalStats();
+          document.getElementById("localBlueprints").textContent = local.blueprints ?? 0;
+          document.getElementById("localLanding").textContent = local.landingCodes ?? 0;
+          document.getElementById("localSessions").textContent = local.sessions ?? 0;
+          document.getElementById("localTime").textContent = fmtTime(local.totalTime ?? 0);
+
+          statsGrid.hidden = false;
+
+          // ── Activity line chart ──
+          const labels = Object.keys(data.dailyActivity || {}).map((d) => {
+            const dt = new Date(d + "T00:00:00");
+            return dt.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+          });
+          const values = Object.values(data.dailyActivity || {});
+
+          if (actChart) actChart.destroy();
+          actChart = new Chart(document.getElementById("activityChart"), {
+            type: "line",
+            data: {
+              labels,
+              datasets: [
+                {
+                  label: "Projects saved",
+                  data: values,
+                  fill: true,
+                  backgroundColor: "rgba(10,127,90,0.09)",
+                  borderColor: "#0a7f5a",
+                  borderWidth: 2,
+                  pointBackgroundColor: "#0a7f5a",
+                  pointRadius: 4,
+                  tension: 0.4
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } }
+              }
+            }
+          });
+
+          // ── Breakdown bar chart ──
+          const brkLabels = ["Blueprints\n(local)", "Landing Codes\n(local)", "DB Projects"];
+          const brkValues = [local.blueprints ?? 0, local.landingCodes ?? 0, data.totalProjects ?? 0];
+
+          if (brkChart) brkChart.destroy();
+          brkChart = new Chart(document.getElementById("breakdownChart"), {
+            type: "bar",
+            data: {
+              labels: brkLabels,
+              datasets: [
+                {
+                  data: brkValues,
+                  backgroundColor: ["#0a7f5a", "#f29e4c", "#1b3a4b"],
+                  borderRadius: 8
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } }
+              }
+            }
+          });
+
+          chartsRow.hidden = false;
+
+          // ── Deploy section ──
+          const netlifyBtn = document.getElementById("deployNetlifyBtn");
+          const vercelBtn = document.getElementById("deployVercelBtn");
+          const netlifyStatus = document.getElementById("netlifyStatus");
+          const vercelStatus = document.getElementById("vercelStatus");
+
+          if (data.hasNetlifyDeployHook) {
+            netlifyStatus.textContent = "Configured";
+            netlifyStatus.className = "status-badge badge-ok";
+            netlifyBtn.disabled = false;
+          }
+          if (data.hasVercelDeployHook) {
+            vercelStatus.textContent = "Configured";
+            vercelStatus.className = "status-badge badge-ok";
+            vercelBtn.disabled = false;
+          }
+          deploySection.hidden = false;
+
+          // ── Recent projects ──
+          const tbody = document.getElementById("recentBody");
+          tbody.innerHTML = "";
+          const projects = data.recentProjects || [];
+          projects.forEach((proj, i) => {
+            const idea = escHtml(proj.idea_input?.startupIdea);
+            const industry = escHtml(proj.idea_input?.industry);
+            const country = escHtml(proj.idea_input?.country);
+            const budget = escHtml(proj.idea_input?.budget);
+            const date = new Date(proj.created_at).toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+              year: "numeric"
+            });
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td>${i + 1}</td><td title="${idea}">${idea}</td><td>${industry}</td><td>${country}</td><td>${budget}</td><td>${date}</td>`;
+            tbody.appendChild(tr);
+          });
+          if (projects.length > 0) recentSection.hidden = false;
+
+          loadingMsg.hidden = true;
+        } catch (err) {
+          loadingMsg.hidden = true;
+          errorBanner.textContent = `Failed to load stats: ${err.message}`;
+          errorBanner.hidden = false;
+        }
+      }
+
+      async function triggerDeploy(platform) {
+        const resultEl = document.getElementById(`${platform}Result`);
+        const platformCap = platform.charAt(0).toUpperCase() + platform.slice(1);
+        const btn = document.getElementById(`deploy${platformCap}Btn`);
+        if (!resultEl || !btn) return;
+
+        btn.disabled = true;
+        resultEl.textContent = "Deploying…";
+        resultEl.style.color = "var(--muted)";
+
+        try {
+          const res = await fetch(`/api/deploy/${platform}`, { method: "POST" });
+          if (res.status === 401) {
+            window.location.href = "/admin-login.html";
+            return;
+          }
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || err.message || "Deploy failed");
+          }
+          resultEl.textContent = "✓ Deploy triggered!";
+          resultEl.style.color = "#0a7f5a";
+        } catch (err) {
+          resultEl.textContent = `✗ ${err.message}`;
+          resultEl.style.color = "var(--danger)";
+        } finally {
+          btn.disabled = false;
+        }
+      }
+
+      document.getElementById("deployNetlifyBtn").addEventListener("click", () => triggerDeploy("netlify"));
+      document.getElementById("deployVercelBtn").addEventListener("click", () => triggerDeploy("vercel"));
+      document.getElementById("refreshBtn").addEventListener("click", loadStats);
+      document.getElementById("logoutBtn").addEventListener("click", async () => {
+        await fetch("/api/admin/logout", { method: "POST" }).catch(() => {});
+        window.location.href = "/admin-login.html";
+      });
+
+      loadStats();
+    </script>
+  </body>
+</html>

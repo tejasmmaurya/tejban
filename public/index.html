@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TejBan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="startupSplash" class="startup-splash" aria-hidden="true">
+      <div class="startup-splash-inner">
+        <p class="splash-tag">TejBan</p>
+        <h2>Build. Validate. Launch.</h2>
+        <p class="splash-powered">Powered by Tejas Developers</p>
+      </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay">
+      <div class="loading-box" role="status" aria-live="polite">
+        <div class="loader-ring"></div>
+        <p id="loadingText">Building your startup blueprint...</p>
+      </div>
+    </div>
+
+    <div class="bg-shape bg-shape-1"></div>
+    <div class="bg-shape bg-shape-2"></div>
+
+    <aside id="authToast" class="auth-toast" hidden aria-live="polite">
+      <div class="auth-toast-content">
+        <p id="authToastText">Authentication required.</p>
+        <div class="auth-toast-actions">
+          <button id="authToastLogin" type="button" class="btn-primary">Login</button>
+          <button id="authToastDismiss" type="button" class="btn-outline">Dismiss</button>
+        </div>
+      </div>
+    </aside>
+
+    <div id="authModal" class="auth-modal" hidden>
+      <div id="authBackdrop" class="auth-backdrop"></div>
+      <section class="auth-dialog panel auth-split-layout">
+        <!-- New Visual Side -->
+        <div class="auth-visual">
+          <div class="auth-visual-content">
+            <h2 class="auth-visual-logo">TejBan</h2>
+            <p class="auth-visual-tagline">Your AI-powered bridge to the next big startup.</p>
+            <div class="auth-visual-features">
+              <div class="feature-item">
+                <span class="feature-icon">✨</span>
+                <span>Instant Blueprints</span>
+              </div>
+              <div class="feature-item">
+                <span class="feature-icon">💻</span>
+                <span>Landing Page Code</span>
+              </div>
+              <div class="feature-item">
+                <span class="feature-icon">📄</span>
+                <span>Investor-ready PDFs</span>
+              </div>
+            </div>
+            <div class="auth-visual-glow"></div>
+          </div>
+        </div>
+
+        <!-- Form Side -->
+        <div class="auth-form-side">
+          <div class="row-wrap auth-header">
+            <h2>Welcome Back</h2>
+            <button id="closeAuthModal" type="button" class="btn-outline auth-close">Close</button>
+          </div>
+          <p id="authPolicyHint" class="status-subtle">Password policy loading...</p>
+          <p id="authFeedback" class="auth-feedback" hidden aria-live="polite"></p>
+          
+          <div class="auth-mode-switch" role="tablist" aria-label="Account mode">
+            <button id="authModeSignIn" type="button" class="auth-mode-btn is-active" role="tab" aria-selected="true">Sign In</button>
+            <button id="authModeSignUp" type="button" class="auth-mode-btn" role="tab" aria-selected="false">Create Account</button>
+          </div>
+          
+          <div class="auth-grid-container">
+            <div class="auth-grid">
+              <label class="floating-label">
+                <span class="label-text">Email Address</span>
+                <input id="authEmail" type="email" placeholder="you@example.com" />
+              </label>
+              <label class="floating-label">
+                <span class="label-text">Password</span>
+                <input id="authPassword" type="password" placeholder="Min 8, include A-z and number" />
+              </label>
+            </div>
+          </div>
+
+          <section id="authSignupSection" class="auth-signup-section" aria-labelledby="signupDetailsHeading" hidden>
+            <div class="auth-section-head">
+              <h3 id="signupDetailsHeading">Complete Your Profile</h3>
+              <p>Just a few more details to personalize your experience before creating an account.</p>
+            </div>
+            <div class="auth-grid auth-grid-signup">
+              <label class="floating-label">
+                <span class="label-text">Full Name</span>
+                <input id="authFullName" type="text" placeholder="Tejas Kumar" />
+              </label>
+              <label class="floating-label">
+                <span class="label-text">Date Of Birth</span>
+                <input id="authDateOfBirth" type="date" />
+              </label>
+              <label class="floating-label">
+                <span class="label-text">Headline</span>
+                <input id="authHeadline" type="text" placeholder="Founder building an AI startup" />
+              </label>
+              <label class="floating-label">
+                <span class="label-text">Website <span class="optional-badge">(Optional)</span></span>
+                <input id="authWebsite" type="url" placeholder="https://example.com" />
+              </label>
+              <label class="floating-label auth-grid-span-2">
+                <span class="label-text">Bio</span>
+                <textarea id="authBio" rows="2" placeholder="What you do, what you are building, and your domain experience"></textarea>
+              </label>
+            </div>
+            
+            <fieldset class="auth-choice-group">
+              <legend>2-Step Verification Preference</legend>
+              <div class="auth-choice-flex">
+                <label class="auth-choice-option stylish-radio">
+                  <input type="radio" name="authTwoStep" value="email" checked />
+                  <div class="radio-content">
+                    <span class="radio-icon">📧</span>
+                    <span class="radio-text">Email code</span>
+                  </div>
+                </label>
+                <label class="auth-choice-option stylish-radio">
+                  <input type="radio" name="authTwoStep" value="authenticator_app" />
+                  <div class="radio-content">
+                    <span class="radio-icon">📱</span>
+                    <span class="radio-text">Authenticator</span>
+                  </div>
+                </label>
+              </div>
+            </fieldset>
+            
+            <div class="auth-legal-box">
+              <h3>Safety & Compliance</h3>
+              <ul>
+                <li>AI-generated content must be human-reviewed.</li>
+                <li>Output must not mislead investors or regulators.</li>
+                <li>Abuse or automated usage may lead to access removal.</li>
+              </ul>
+              <div class="auth-checkbox-group">
+                <label class="auth-check-row stylish-checkbox">
+                  <input id="authAcceptTerms" type="checkbox" />
+                  <div class="checkbox-indicator"></div>
+                  <span>I agree to the TejBan terms and conditions.</span>
+                </label>
+                <label class="auth-check-row stylish-checkbox">
+                  <input id="authAcceptSafety" type="checkbox" />
+                  <div class="checkbox-indicator"></div>
+                  <span>I understand the output requires verification.</span>
+                </label>
+              </div>
+            </div>
+          </section>
+          
+          <div class="button-row auth-actions">
+            <button id="signUpBtn" type="button" class="btn-primary auth-main-btn">Create Account</button>
+            <button id="signInBtn" type="button" class="btn-primary auth-main-btn">Log In</button>
+            <button id="resetPasswordBtn" type="button" class="btn-text">Forgot Password?</button>
+            <button id="signOutBtn" type="button" class="btn-danger">Sign Out</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="profilePanel" class="auth-modal" hidden>
+      <div id="profileBackdrop" class="auth-backdrop"></div>
+      <section class="profile-dialog panel">
+        <div class="row-wrap">
+          <div>
+            <h2>Profile</h2>
+            <p id="profileEmail" class="status-subtle">Not signed in</p>
+          </div>
+          <button id="closeProfilePanel" type="button" class="btn-outline auth-close">Close</button>
+        </div>
+        <div class="profile-grid">
+          <nav class="profile-nav">
+            <button id="profileGeneralTab" type="button" class="btn-soft profile-nav-item">General Settings</button>
+            <button id="profileAccountTab" type="button" class="btn-outline profile-nav-item">Account Security</button>
+            <button id="profileNotificationsTab" type="button" class="btn-outline profile-nav-item">Notifications</button>
+            <button id="profileApiUsageTab" type="button" class="btn-outline profile-nav-item">API Usage</button>
+            <button id="profilePrivacyTab" type="button" class="btn-outline profile-nav-item">Privacy</button>
+            <button id="profileTermsTab" type="button" class="btn-outline profile-nav-item">Terms</button>
+            <button id="profileDeactivateTab" type="button" class="btn-outline profile-nav-item">Deactivate</button>
+            <button id="profileDeleteTab" type="button" class="btn-danger profile-nav-item">Delete</button>
+            <a class="btn-outline profile-link" href="https://tejasdevelopers.netlify.app" target="_blank" rel="noopener noreferrer">Tejas Developers</a>
+          </nav>
+          <section id="profileContent" class="profile-content"></section>
+        </div>
+      </section>
+    </div>
+
+    <main class="container">
+      <header class="site-header">
+        <div>
+          <p class="eyebrow">TejBan</p>
+          <p class="header-note">AI startup planning workspace</p>
+        </div>
+        <div class="header-actions">
+          <span id="authStatus" class="auth-pill">Not signed in</span>
+          <a class="header-link-button" href="https://tejasdevelopers.netlify.app" target="_blank" rel="noopener noreferrer">Tejas Developers</a>
+          <button id="openAuthModal" type="button" class="btn-primary">Login</button>
+          <button id="profileAvatarButton" type="button" class="profile-avatar" hidden aria-label="Open profile menu">T</button>
+          <div id="profileMenu" class="profile-menu" hidden>
+            <button id="openProfilePanel" type="button" class="profile-menu-item">Profile Settings</button>
+            <button id="openAuthFromMenu" type="button" class="profile-menu-item">Account</button>
+            <a class="profile-menu-item profile-menu-link" href="/admin">Admin Dashboard</a>
+            <a class="profile-menu-item profile-menu-link" href="https://tejasdevelopers.netlify.app" target="_blank" rel="noopener noreferrer">Tejas Developers</a>
+          </div>
+        </div>
+      </header>
+
+      <section class="hero">
+        <h1>From one idea to a full startup blueprint in minutes.</h1>
+        <p class="subtitle">Validate your startup, generate your business plan, craft your brand, and structure your investor pitch from one input.</p>
+      </section>
+
+      <section class="panel">
+          <div class="gamified-progress" id="gamifiedProgress">
+            <div class="step-dot active" id="dot1">1</div>
+            <div class="step-dot" id="dot2">2</div>
+            <div class="step-dot" id="dot3">3</div>
+            <div class="step-dot" id="dot4">4</div>
+          </div>
+          <form id="ideaForm" class="idea-form gamified-form">
+            <!-- Step 1: Idea -->
+            <div class="form-step active" id="step1">
+              <h3>Step 1: The Spark 💡</h3>
+              <p style="font-size: 0.9em; opacity: 0.7; margin-bottom: 15px;">What problem are you solving?</p>
+              <label>
+                Startup Idea
+                  <input name="startupIdea" placeholder="e.g. AI tool that helps students revise for exams" />
+              <h3>Step 2: Who Needs This? 🎯</h3>
+              <p style="font-size: 0.9em; opacity: 0.7; margin-bottom: 15px;">Define your early adopters.</p>
+              <label>
+                Target Users
+                <input name="targetUsers" placeholder="e.g. College students preparing for finals" />
+              </label>
+              <label>
+                Country / Region
+                <input name="country" placeholder="e.g. India" />
+              </label>
+              <div class="button-row">
+                <button type="button" class="btn-soft" onclick="prevStep(1)">Back</button>
+                <button type="button" class="btn-primary" onclick="nextStep(3)">Next: Industry & Budget 🔓</button>
+              </div>
+            </div>
+
+            <!-- Step 3: Industry & Budget -->
+            <div class="form-step" id="step3" style="display: none;">
+              <h3>Step 3: Market Reality 🌍</h3>
+              <p style="font-size: 0.9em; opacity: 0.7; margin-bottom: 15px;">Contextualize your startup.</p>
+              <label>
+                Industry
+                <input name="industry" placeholder="e.g. EdTech" />
+              </label>
+              <label>
+                Initial Budget
+                <input name="budget" placeholder="e.g. INR 3,00,000" />
+              </label>
+              <div class="button-row">
+                <button type="button" class="btn-soft" onclick="prevStep(2)">Back</button>
+                <button type="button" class="btn-primary" onclick="nextStep(4)">Next: Ready to Build 🚀</button>
+              </div>
+            </div>
+
+            <!-- Step 4: Launch -->
+            <div class="form-step" id="step4" style="display: none;">
+              <h3>Step 4: Generate Journey 🏁</h3>
+              <p style="font-size: 0.9em; opacity: 0.8; margin-bottom: 20px;">We're ready to engineer your full business model, MVP MVP plan, and reality check.</p>
+              <div class="button-row">
+                <button type="button" class="btn-soft" onclick="prevStep(3)">Back</button>
+                <button type="submit" id="generateButton" class="btn-primary" style="background: linear-gradient(90deg, #ff4757, #ff6b81); font-weight: bold;">Launch AI Co-Founder Builders</button>
+              </div>
+            </div>
+      </section>
+
+
+      <section class="panel actions-panel">
+        <h2>Exports, Save, and Deploy</h2>
+        <div class="button-row">
+          <button id="downloadJson" class="btn-soft" type="button">Download JSON</button>
+          <button id="downloadBusinessPdf" class="btn-outline" type="button">Business Plan PDF</button>
+          <button id="downloadPitchPdf" class="btn-outline" type="button">Pitch Deck PDF</button>
+          <button id="export-premium-pdf" class="btn-primary premium-btn" type="button">🪄 Premium Report PDF</button>
+          <button id="saveProject" class="btn-primary" type="button">Save Project</button>
+          <button id="loadHistory" class="btn-soft" type="button">Load History</button>
+          <button id="loadFeed" class="btn-soft" type="button">🌐 Global Feed</button>
+          <button id="generateLandingCode" class="btn-primary" type="button">Generate Landing Code</button>
+        </div>
+        <p id="actionMessage" class="status-message"></p>
+      </section>
+
+      <section class="panel results" id="resultsPanel" hidden>
+        <div class="results-header">
+          <h2>Your Startup Blueprint</h2>
+        </div>
+        <div id="summaryGrid" class="summary-grid"></div>
+        <div id="resultGrid" class="result-grid"></div>
+      </section>
+
+      <section class="panel" id="historyPanel" hidden>
+        <h2>Saved Project History</h2>
+        <div id="historyList" class="history-list"></div>
+      </section>
+
+      <section class="panel" id="feedPanel" hidden>
+        <h2>🌍 Community Startup Feed</h2>
+        <div id="feedList" class="history-list"></div>
+      </section>
+
+      <section class="panel" id="landingCodePanel" hidden>
+        <div class="landing-panel-header">
+          <h2>Landing Page Code</h2>
+          <button id="openPreviewTab" class="btn-outline" type="button">Open in New Tab</button>
+        </div>
+        <div class="landing-tabs" role="tablist">
+            <button id="tabPreview" class="landing-tab is-active" role="tab" aria-selected="true" type="button">Marketing Page</button>
+            <button id="tabHtml" class="landing-tab" role="tab" aria-selected="false" type="button">HTML Code</button>
+            <button id="tabReact" class="landing-tab" role="tab" aria-selected="false" type="button">MVP App Code 💀</button>
+        </div>
+        <div id="panelPreview" class="landing-tab-panel">
+          <iframe id="landingPreviewFrame" class="preview-frame" title="Generated Landing Page Preview"></iframe>
+        </div>
+        <div id="panelHtml" class="landing-tab-panel" hidden>
+          <div class="code-toolbar">
+            <span class="code-lang-label">HTML</span>
+            <button id="copyHtmlBtn" class="btn-outline code-copy-btn" type="button">Copy</button>
+          </div>
+          <pre id="landingHtmlOutput" class="code-block"></pre>
+        </div>
+        <div id="panelReact" class="landing-tab-panel" hidden>
+          <div class="code-toolbar">
+            <span class="code-lang-label">React</span>
+            <button id="copyReactBtn" class="btn-outline code-copy-btn" type="button">Copy</button>
+          </div>
+          <pre id="landingReactOutput" class="code-block"></pre>
+        </div>
+      </section>
+
+      <footer class="footer-note">
+        Powered by
+        <a href="https://tejasdevelopers.netlify.app" target="_blank" rel="noopener noreferrer">Tejas Developers</a>
+      </footer>
+    </main>
+
+    <!-- PDF Loading Overlay -->
+    <div id="pdfLoadingOverlay" class="pdf-loading-overlay" hidden>
+      <div class="pdf-loader-content">
+        <div class="pdf-spinner"></div>
+        <h3 style="margin-bottom: 15px; font-weight: 600;">Generating Premium Report</h3>
+        <p style="opacity: 0.8; font-size: 14px;">Analyzing trends, generating analytical charts, and rendering your high-fidelity PDF...</p>
+        <div class="pdf-progress-bar">
+          <div id="pdfProgressBarFill" class="pdf-progress-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

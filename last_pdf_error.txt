@@ -1,0 +1,3 @@
+Error: PDF generation service failed to initialize: The browser is already running for C:\Users\RAKA\AppData\Local\Temp\puppeteer_dev_chrome_profile-Sx2K1e. Use a different `userDataDir` or stop the running browser first.
+    at PremiumPDFGenerator.initialize (C:\Users\RAKA\OneDrive\Desktop\imp\AI Startup Builder\src\services\premiumPDFGenerator.js:33:15)
+    at async C:\Users\RAKA\OneDrive\Desktop\imp\AI Startup Builder\src\server.js:283:5

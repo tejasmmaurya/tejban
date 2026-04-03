@@ -1,0 +1,1 @@
+fetch('http://localhost:3000/api/export/premium-report-pdf', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ blueprint: { name: 'Test' } }) }).then(r => r.text()).then(t => require('fs').writeFileSync('fetch-out.txt', t)).catch(console.log);

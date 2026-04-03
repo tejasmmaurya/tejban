@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TejBan Admin Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #f2efe9;
+        --surface: #fffaf0;
+        --ink: #1b1d29;
+        --accent: #0a7f5a;
+        --line: #d9d3c4;
+        --muted: #5d5f6b;
+        --danger: #b91c1c;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 20px;
+        font-family: "Space Grotesk", sans-serif;
+        color: var(--ink);
+        background: radial-gradient(circle at top right, #f7d7bf 0%, var(--bg) 42%), radial-gradient(circle at bottom left, #cfe6dd 0%, transparent 45%), var(--bg);
+      }
+      .card {
+        width: min(460px, 100%);
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 12px 30px rgb(0 0 0 / 0.08);
+      }
+      h1 { margin: 0 0 6px; font-size: 1.35rem; }
+      .sub { margin: 0 0 16px; color: var(--muted); font-size: 0.9rem; }
+      form { display: grid; gap: 10px; }
+      label { display: grid; gap: 6px; font-size: 0.85rem; }
+      input {
+        width: 100%;
+        min-height: 42px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 0 12px;
+        font: inherit;
+      }
+      button {
+        min-height: 44px;
+        border: 1px solid transparent;
+        border-radius: 999px;
+        background: var(--accent);
+        color: #fff;
+        font: 600 0.9rem "Space Grotesk", sans-serif;
+        cursor: pointer;
+        margin-top: 8px;
+      }
+      .msg { margin: 12px 0 0; font-size: 0.84rem; min-height: 20px; }
+      .err { color: var(--danger); }
+      .ok { color: var(--accent); }
+      .footer { margin-top: 14px; font-size: 0.8rem; color: var(--muted); }
+      .footer a { color: var(--accent); text-decoration: none; }
+    </style>
+  </head>
+  <body>
+    <section class="card">
+      <h1>Admin Sign In</h1>
+      <p class="sub">Use your admin username, email, and password to access dashboard controls.</p>
+      <form id="adminLoginForm">
+        <label>
+          Username
+          <input id="adminUsername" type="text" autocomplete="username" required />
+        </label>
+        <label>
+          Email
+          <input id="adminEmail" type="email" autocomplete="email" required />
+        </label>
+        <label>
+          Password
+          <input id="adminPassword" type="password" autocomplete="current-password" required />
+        </label>
+        <button id="adminLoginBtn" type="submit">Secure Login</button>
+      </form>
+      <p id="adminLoginMsg" class="msg"></p>
+      <p class="footer"><a href="/">Back to main app</a></p>
+    </section>
+
+    <script>
+      const form = document.getElementById("adminLoginForm");
+      const msg = document.getElementById("adminLoginMsg");
+      const btn = document.getElementById("adminLoginBtn");
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        msg.textContent = "";
+        msg.className = "msg";
+        btn.disabled = true;
+
+        try {
+          const payload = {
+            username: document.getElementById("adminUsername").value.trim(),
+            email: document.getElementById("adminEmail").value.trim(),
+            password: document.getElementById("adminPassword").value
+          };
+
+          const response = await fetch("/api/admin/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            throw new Error(err.error || "Login failed");
+          }
+
+          msg.textContent = "Login successful. Redirecting...";
+          msg.className = "msg ok";
+          window.location.href = "/admin";
+        } catch (error) {
+          msg.textContent = error.message || "Login failed";
+          msg.className = "msg err";
+        } finally {
+          btn.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>
