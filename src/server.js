@@ -236,28 +236,17 @@ app.post("/api/chat", async (req, res) => {
     return res.status(500).json({ error: "Failed to process chat message" });
   }
 });
-  if (!parsed.success) {
-    return res.status(400).json({
-      error: "Invalid input",
-      details: parsed.error.flatten()
-    });
-  }
+
+app.post("/api/generate-landing-code", async (req, res) => {
+  const parsed = ideaSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: "Invalid input" });
 
   try {
-    await requireEligibleUser(req.headers.authorization, {
-      requireProfile: true,
-      requireTermsAcceptance: true,
-      requireTwoStepPreference: true
-    });
-    const landingCode = await generateLandingCode(parsed.data);
-    return res.json({ landingCode });
+    await requireEligibleUser(req.headers.authorization, true);
+    const result = await generateLandingCode(parsed.data);
+    return res.json(result);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    const status = /confirm|verify|profile|terms|2-step/i.test(message) ? 401 : 500;
-    return res.status(status).json({
-      error: "Landing code generation failed",
-      message
-    });
+    return res.status(500).json({ error: "Failed to generate landing code", message: error.message });
   }
 });
 
