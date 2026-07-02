@@ -91,12 +91,15 @@ async function handleChatSend() {
   chatMessages.scrollTop = chatMessages.scrollHeight;
 
   try {
+    const formData = Object.fromEntries(new FormData(document.getElementById("ideaForm")).entries());
+    const hasData = formData.startupIdea && formData.industry;
+
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         message: text,
-        context: globalState.lastInput || null
+        context: hasData ? formData : null
       })
     });
     const data = await res.json();
