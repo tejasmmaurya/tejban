@@ -48,6 +48,71 @@ const authBio = document.getElementById("authBio");
 const authAcceptTerms = document.getElementById("authAcceptTerms");
 const authAcceptSafety = document.getElementById("authAcceptSafety");
 const signUpBtn = document.getElementById("signUpBtn");
+
+// Chatbot DOM Elements
+const chatToggle = document.getElementById("chatToggle");
+const chatBox = document.getElementById("chatBox");
+const chatClose = document.getElementById("chatClose");
+const chatInput = document.getElementById("chatInput");
+const chatSend = document.getElementById("chatSend");
+const chatMessages = document.getElementById("chatMessages");
+
+// Toggle chat logic
+if (chatToggle) {
+  chatToggle.addEventListener("click", () => {
+    chatBox.hidden = !chatBox.hidden;
+  });
+}
+if (chatClose) {
+  chatClose.addEventListener("click", () => {
+    chatBox.hidden = true;
+  });
+}
+
+// Chat sending logic
+async function handleChatSend() {
+  if (!chatInput || !chatMessages) return;
+  const text = chatInput.value.trim();
+  if (!text) return;
+
+  // Render User Message
+  const userMsg = document.createElement("div");
+  userMsg.className = "chat-msg chat-user";
+  userMsg.textContent = text;
+  chatMessages.appendChild(userMsg);
+  chatInput.value = "";
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  // Add typing indicator
+  const loadMsg = document.createElement("div");
+  loadMsg.className = "chat-msg chat-tejas";
+  loadMsg.textContent = "Tejas is typing...";
+  chatMessages.appendChild(loadMsg);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: text,
+        context: globalState.lastInput || null
+      })
+    });
+    const data = await res.json();
+    loadMsg.innerHTML = String(data.reply).replace(/\\n/g, '<br>') || "Sorry, I encountered an error.";
+  } catch (err) {
+    loadMsg.textContent = "Error connecting to Tejas AI server.";
+  }
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+if (chatSend) chatSend.addEventListener("click", handleChatSend);
+if (chatInput) {
+  chatInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") handleChatSend();
+  });
+}
 const signInBtn = document.getElementById("signInBtn");
 const signOutBtn = document.getElementById("signOutBtn");
 const resetPasswordBtn = document.getElementById("resetPasswordBtn");
@@ -1302,6 +1367,8 @@ function runStartupSplash() {
     setTimeout(() => {
       startupSplash.remove();
       document.body.classList.remove("splash-active");
+      const chatWidget = document.getElementById("chatWidget");
+      if (chatWidget) chatWidget.hidden = false;
     }, 500);
   };
 
@@ -1584,8 +1651,9 @@ async function initSupabase() {
 
 function updateAuthStatus(user) {
   currentUser = user;
-  authStatus.textContent = user ? `Signed in: ${user.email}` : "Not signed in";
-  profileEmail.textContent = user ? user.email : "Not signed in";
+  const displayName = user ? (user.user_metadata?.full_name || user.email.split('@')[0]) : "";
+  authStatus.textContent = user ? `Hi 👋, ${displayName}` : "Not signed in";
+  profileEmail.textContent = user ? `Hi 👋, ${displayName}` : "Not signed in";
   if (!user) {
     setProfileMenuOpen(false);
     setProfilePanelOpen(false);

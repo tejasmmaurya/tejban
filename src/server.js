@@ -9,6 +9,7 @@ const { generateStartupBlueprint } = require("./services/aiEngine");
 const { buildBusinessPlanPdf, buildPitchDeckPdf } = require("./services/pdfExporter");
 const { generateLandingCode } = require("./services/landingCodeEngine");
 const PremiumPDFGenerator = require("./services/premiumPDFGenerator");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 const {
   getPublicSupabaseConfig,
   requireEligibleUser,
@@ -198,6 +199,43 @@ app.post("/api/generate", async (req, res) => {
 
 app.post("/api/generate-landing-code", async (req, res) => {
   const parsed = ideaSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: "Invalid input" });
+  try {
+    await requireEligibleUser(req.headers.authorization, true);
+    const result = await generateLandingCode(parsed.data);
+    return res.json(result);
+  } catch (error) {
+    return res.status(500).json({ error: "Failed to generate landing code", message: error.message });
+  }
+});
+
+app.post("/api/chat", async (req, res) => {
+  const { message, context } = req.body;
+  if (!message) return res.status(400).json({ error: "Message is required" });
+
+  try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) return res.status(500).json({ error: "API key is missing" });
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+
+    let systemInstruction = "Your name is Tejas. You are an expert AI Co-Founder and business advisor for the user's startup. You MUST answer concisely and professionally.";
+    if (context && context.startupIdea) {
+      systemInstruction += `\n\nContext about the user's current startup idea:\nIdea: ${context.startupIdea}\nTarget Users: ${context.targetUsers}\nIndustry: ${context.industry}\nBudget: ${context.budget}`;
+    } else {
+      systemInstruction += "\n\nThe user hasn't generated a startup blueprint yet. Help them brainstorm from scratch.";
+    }
+
+    const prompt = `${systemInstruction}\n\nUser: ${message}\nTejas:`;
+    
+    const result = await model.generateContent(prompt);
+    return res.json({ reply: result.response.text() });
+  } catch (error) {
+    console.error("Chat error:", error);
+    return res.status(500).json({ error: "Failed to process chat message" });
+  }
+});
   if (!parsed.success) {
     return res.status(400).json({
       error: "Invalid input",

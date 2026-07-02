@@ -32,16 +32,29 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+      background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 50%, #020617 100%);
       text-align: center;
       min-height: 100vh;
+      position: relative;
+    }
+
+    .cover::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at top right, rgba(0, 212, 255, 0.15), transparent 50%);
+      pointer-events: none;
     }
 
     .cover h1 {
-      font-size: 56px;
-      font-weight: 700;
+      font-size: 64px;
+      font-weight: 800;
       margin-bottom: 20px;
-      letter-spacing: -1px;
+      letter-spacing: -1.5px;
+      background: linear-gradient(90deg, #00d4ff, #8a2be2, #ff007f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 4px 15px rgba(0, 212, 255, 0.2);
     }
 
     .cover .tagline {
@@ -62,16 +75,29 @@
     }
 
     .content-page {
-      background: #1a1a1a;
+      background: linear-gradient(180deg, #0B0F19 0%, #06080d 100%);
       padding: 60px;
+      position: relative;
+    }
+
+    .content-page::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, #00d4ff, #8a2be2, #ff007f);
     }
 
     h2 {
-      font-size: 32px;
-      color: #00d4ff;
+      font-size: 34px;
       margin-bottom: 30px;
-      font-weight: 600;
+      font-weight: 700;
       letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #00d4ff, #8a2be2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+      text-transform: uppercase;
+      font-size: 26px;
     }
 
     h3 {
@@ -106,18 +132,30 @@
     }
 
     .card {
-      background: #262626;
-      padding: 25px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      border-left: 4px solid #00d4ff;
+      background: linear-gradient(145deg, rgba(16, 23, 39, 0.9), rgba(11, 15, 25, 0.9));
+      padding: 30px;
+      border-radius: 16px;
+      margin-bottom: 25px;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; bottom: 0; width: 4px;
+      background: linear-gradient(180deg, #00d4ff, #8a2be2);
     }
 
     .card h4 {
-      font-size: 16px;
+      font-size: 18px;
       color: #00d4ff;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       font-weight: 600;
+      letter-spacing: 0.5px;
     }
 
     .card p {
@@ -147,9 +185,10 @@
 
     .score-fill {
       height: 100%;
-      background: linear-gradient(90deg, #00d4ff, #0099cc);
+      background: linear-gradient(90deg, #00d4ff, #8a2be2);
       border-radius: 6px;
       transition: width 0.3s ease;
+      box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
     }
 
     .highlight {
@@ -210,39 +249,37 @@
     <div class="score-container">
       <div class="score-label">Market Demand ({{dnaMarketDemand}}/10)</div>
       <div class="score-bar">
-        <div class="score-fill" style="width: {{dnaMarketDemandPct}}%"></div>
+        <div class="score-fill" data-width="{{dnaMarketDemandPct}}"></div>
       </div>
     </div>
     <div class="score-container">
       <div class="score-label">Competition ({{dnaCompetition}}/10)</div>
       <div class="score-bar">
-        <div class="score-fill" style="width: {{dnaCompetitionPct}}%"></div>
+        <div class="score-fill" data-width="{{dnaCompetitionPct}}"></div>
       </div>
     </div>
     <div class="score-container">
       <div class="score-label">Scalability ({{dnaScalability}}/10)</div>
       <div class="score-bar">
-        <div class="score-fill" style="width: {{dnaScalabilityPct}}%"></div>
+        <div class="score-fill" data-width="{{dnaScalabilityPct}}"></div>
       </div>
     </div>
     <div class="score-container">
       <div class="score-label">Profitability ({{dnaProfitability}}/10)</div>
       <div class="score-bar">
-        <div class="score-fill" style="width: {{dnaProfitabilityPct}}%"></div>
+        <div class="score-fill" data-width="{{dnaProfitabilityPct}}"></div>
       </div>
     </div>
     
     <h3 style="font-size: 24px; color: #00d4ff; text-align: right;">Overall Score: {{dnaFinalScore}}/100</h3>
     
-    <h2 style="margin-top: 40px; color: #ff4757;">Reality Check AI</h2>
-    <div class="card" style="border-left-color: #ff4757; background: #2a1114; border-radius: 10px; padding: 25px;">
-      <h4 style="color: #ff4757;">Brutal Honesty</h4>
-      <p style="margin-bottom: 0;">{{realityCheckText}}</p>
+    <h2 style="margin-top: 40px; background: linear-gradient(90deg, #ff4757, #ff9f43); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Reality Check AI</h2>
+    <div class="card" style="background: linear-gradient(145deg, rgba(42, 17, 20, 0.9), rgba(20, 5, 8, 0.9)); padding: 30px; border-radius: 12px; margin-bottom: 25px; position: relative;">
+      <h4 style="color: #ff4757; font-size: 18px; margin-bottom: 12px; font-weight: 600;">Brutal Honesty</h4>
+      <p style="margin-bottom: 0; line-height: 1.8;">{{realityCheckText}}</p>
     </div>
 
-    <div class="footer">
-      AI Engine Insights
-    </div>
+    <div class="footer">&#169; TejBan - Tejas Developers | AI Engine Insights | TejBan - Tejas Developers</div>
   </div>
 
   <!-- EXECUTIVE SUMMARY -->
@@ -260,9 +297,7 @@
       <li>{{highlight3}}</li>
     </ul>
 
-    <div class="footer">
-      Generated by AI Startup Builder • Confidential
-    </div>
+    <div class="footer">Generated by AI Startup Builder • Confidential | TejBan - Tejas Developers</div>
   </div>
 
   <!-- MARKET ANALYSIS -->
@@ -272,7 +307,7 @@
     <div class="score-container">
       <div class="score-label">Market Opportunity Score</div>
       <div class="score-bar">
-        <div class="score-fill" style="width: {{marketScore}}%"></div>
+        <div class="score-fill" data-width="{{marketScore}}"></div>
       </div>
     </div>
 
@@ -286,9 +321,7 @@
       <li>{{marketPoint3}}</li>
     </ul>
 
-    <div class="footer">
-      Page 2 • Market Analysis
-    </div>
+    <div class="footer">Page 2 • Market Analysis | TejBan - Tejas Developers</div>
   </div>
 
   <!-- COMPETITIVE LANDSCAPE -->
@@ -298,7 +331,7 @@
     <div class="score-container">
       <div class="score-label">Competitive Advantage Rating</div>
       <div class="score-bar">
-        <div class="score-fill" style="width: {{competitiveScore}}%"></div>
+        <div class="score-fill" data-width="{{competitiveScore}}"></div>
       </div>
     </div>
 
@@ -316,9 +349,7 @@
       </div>
     </div>
 
-    <div class="footer">
-      Page 3 • Competitive Analysis
-    </div>
+    <div class="footer">Page 3 • Competitive Analysis | TejBan - Tejas Developers</div>
   </div>
 
   <!-- BUSINESS MODEL -->
@@ -342,9 +373,7 @@
       <li><strong>Payback Period:</strong> {{paybackPeriod}}</li>
     </ul>
 
-    <div class="footer">
-      Page 4 • Business Model
-    </div>
+    <div class="footer">Page 4 • Business Model | TejBan - Tejas Developers</div>
   </div>
 
   <!-- GO-TO-MARKET STRATEGY -->
@@ -368,9 +397,9 @@
       <li>{{milestone3}}</li>
     </ul>
 
-    <h2 style="margin-top: 40px; color: #ff6b81;">First 100 Users Plan</h2>
-    <div class="card" style="border-left-color: #ff6b81;">
-      <h4>Zero-Budget Scrappy Tactics</h4>
+    <h2 style="margin-top: 40px; background: linear-gradient(90deg, #ff6b81, #ff9f43); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">First 100 Users Plan</h2>
+    <div class="card" style="box-shadow: 0 10px 30px rgba(255, 107, 129, 0.1);">
+      <h4 style="color: #ff6b81; font-size: 18px;">Zero-Budget Scrappy Tactics</h4>
       <ul>
         <li>{{firstUser1}}</li>
         <li>{{firstUser2}}</li>
@@ -378,9 +407,7 @@
       </ul>
     </div>
 
-    <div class="footer">
-      Page 5 • Go-To-Market & Acquisition
-    </div>
+    <div class="footer">Page 5 • Go-To-Market & Acquisition | TejBan - Tejas Developers</div>
   </div>
 
   <!-- FUNDING & TEAM -->
@@ -409,9 +436,7 @@
       <li>{{fundUse3}}</li>
     </ul>
 
-    <div class="footer">
-      Page 6 • Team & Funding
-    </div>
+    <div class="footer">Page 6 • Team & Funding | TejBan - Tejas Developers</div>
   </div>
 
   <!-- FINANCIAL PROJECTIONS -->
@@ -432,9 +457,7 @@
     <h3>Assumptions</h3>
     <p>{{financialAssumptions}}</p>
 
-    <div class="footer">
-      Page 7 • Financial Projections
-    </div>
+    <div class="footer">Page 7 • Financial Projections | TejBan - Tejas Developers</div>
   </div>
 
   <!-- RISK & MITIGATION -->
@@ -455,10 +478,19 @@
       <li>{{mitigation3}}</li>
     </ul>
 
-    <div class="footer">
-      Page 8 • Risk Analysis
-    </div>
+    <div class="footer">Page 8 • Risk Analysis | TejBan - Tejas Developers</div>
   </div>
+
+  <script>
+    document.querySelectorAll('.score-fill[data-width]').forEach(function (bar) {
+      var width = parseFloat(bar.getAttribute('data-width'));
+      if (!isNaN(width)) {
+        bar.style.width = Math.max(0, Math.min(100, width)) + '%';
+      }
+    });
+  </script>
 
 </body>
 </html>
+
+
