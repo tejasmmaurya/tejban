@@ -36,6 +36,7 @@ const authToast = document.getElementById("authToast");
 const authToastText = document.getElementById("authToastText");
 const authToastLogin = document.getElementById("authToastLogin");
 const authToastDismiss = document.getElementById("authToastDismiss");
+const googleAuthBtn = document.getElementById("googleAuthBtn");
 
 const authStatus = document.getElementById("authStatus");
 const authEmail = document.getElementById("authEmail");
@@ -157,7 +158,7 @@ let supabaseClient = null;
 let deployConfig = { hasNetlifyDeployHook: false, hasVercelDeployHook: false };
 let authPolicy = {
   passwordMinLength: 8,
-  requireEmailConfirmation: true,
+  requireEmailConfirmation: false,
   redirectUrl: window.location.origin,
   requiredProfileFields: ["full_name", "date_of_birth", "headline", "bio"],
   twoStepOptions: ["email", "authenticator_app"],
@@ -229,7 +230,7 @@ const profileSections = {
   privacy: {
     title: "Privacy",
     copy: "Saved projects are scoped to the authenticated user and filtered through Supabase row level security.",
-    items: ["Only your own projects are listed", "Authenticated access required for history", "Email confirmation can be enforced before protected actions"]
+    items: ["Only your own projects are listed", "Authenticated access required for history", "Email/password and Google sign-in work together"]
   },
   terms: {
     title: "Terms and Conditions",
@@ -369,6 +370,18 @@ function getSelectedTwoStepPreference() {
   return selected instanceof HTMLInputElement ? selected.value : "";
 }
 
+function getLinkedProviders(user) {
+  const identities = Array.isArray(user?.identities) ? user.identities : [];
+  const providers = identities.map((identity) => identity?.provider).filter(Boolean);
+  const fallbackProvider = user?.app_metadata?.provider;
+  const merged = providers.length > 0 ? providers : (fallbackProvider ? [fallbackProvider] : []);
+  return [...new Set(merged)];
+}
+
+function isProviderLinked(user, provider) {
+  return getLinkedProviders(user).includes(provider);
+}
+
 function readSignUpProfileInputs() {
   return {
     fullName: authFullName.value.trim(),
@@ -400,10 +413,6 @@ function formatMissingProfileFields(fields) {
 function getEligibilityState(user = currentUser) {
   if (!user) {
     return { isEligible: false, reason: "Sign in to continue.", action: "auth" };
-  }
-
-  if (authPolicy.requireEmailConfirmation && !user.email_confirmed_at) {
-    return { isEligible: false, reason: "Verify your email before generating results.", action: "auth" };
   }
 
   const profile = normalizeProfile(user, loadCachedProfile(user.id) || {});
@@ -515,11 +524,12 @@ function setAuthMode(mode) {
   signInBtn.hidden = !signInMode;
   resetPasswordBtn.hidden = !signInMode;
   signUpBtn.hidden = signInMode;
+  if (googleAuthBtn) googleAuthBtn.hidden = false;
 
   if (signInMode) {
-    authPolicyHint.textContent = "Sign in with your email and password.";
+    authPolicyHint.textContent = "Sign in with email/password or Google. Email verification is not required.";
   } else {
-    authPolicyHint.textContent = `Password min: ${authPolicy.passwordMinLength} chars. Email confirmation: ${authPolicy.requireEmailConfirmation ? "required" : "optional"}. Terms version: ${authPolicy.termsVersion}.`;
+    authPolicyHint.textContent = `Create an account with email/password or Google. Password min: ${authPolicy.passwordMinLength} chars. Terms version: ${authPolicy.termsVersion}.`;
   }
 }
 
@@ -537,6 +547,7 @@ function syncAuthButtons(user) {
   signInBtn.disabled = !!user;
   signUpBtn.disabled = !!user;
   resetPasswordBtn.disabled = !!user;
+  if (googleAuthBtn) googleAuthBtn.disabled = !!user;
   openAuthModal.textContent = user ? "Account" : "Login";
   openAuthModal.hidden = !!user;
   profileAvatarButton.hidden = !user;
@@ -549,6 +560,7 @@ function syncAuthButtons(user) {
     signInBtn.hidden = true;
     signUpBtn.hidden = true;
     resetPasswordBtn.hidden = true;
+    if (googleAuthBtn) googleAuthBtn.hidden = true;
     signOutBtn.hidden = false;
     authPolicyHint.textContent = `You are signed in as ${displayName}. Use Sign Out to switch accounts.`;
     return;
@@ -920,12 +932,13 @@ async function renderAccountSecuritySection() {
 
   const securityProfile = normalizeProfile(currentUser, loadCachedProfile(currentUser.id) || {});
   const missingProfileFields = getMissingProfileFields(securityProfile);
+  const providers = getLinkedProviders(currentUser);
   const securityStatusGrid = document.createElement("div");
   securityStatusGrid.className = "auth-status-grid";
   securityStatusGrid.innerHTML = `
     <div class="auth-status-card">
-      <h4>Email Verification</h4>
-      <p>${currentUser.email_confirmed_at ? "Verified" : "Pending verification"}</p>
+      <h4>Connected Providers</h4>
+      <p>${providers.length ? providers.map((provider) => provider === "google" ? "Google" : provider).join(", ") : "Email"}</p>
     </div>
     <div class="auth-status-card">
       <h4>Profile Status</h4>
@@ -986,6 +999,34 @@ async function renderAccountSecuritySection() {
   safetyActions.appendChild(acceptTermsBtn);
   safetyActions.appendChild(acceptTermsMsg);
   profileContent.appendChild(safetyActions);
+
+  const googleLinkRow = document.createElement("div");
+  googleLinkRow.className = "profile-settings-actions";
+
+  const googleLinkBtn = document.createElement("button");
+  googleLinkBtn.type = "button";
+  googleLinkBtn.className = "btn-outline";
+  googleLinkBtn.textContent = isProviderLinked(currentUser, "google") ? "Google Linked" : "Link Google Account";
+  googleLinkBtn.disabled = isProviderLinked(currentUser, "google");
+
+  const googleLinkMsg = document.createElement("p");
+  googleLinkMsg.className = "inline-note";
+
+  googleLinkBtn.addEventListener("click", async () => {
+    try {
+      setAuthRequestBusy(true);
+      await startGoogleAuth(true);
+    } catch (error) {
+      googleLinkMsg.textContent = error.message || "Unable to link Google account.";
+      googleLinkMsg.style.color = "#b91c1c";
+    } finally {
+      setAuthRequestBusy(false);
+    }
+  });
+
+  googleLinkRow.appendChild(googleLinkBtn);
+  googleLinkRow.appendChild(googleLinkMsg);
+  profileContent.appendChild(googleLinkRow);
 
   const twoStepTitle = document.createElement("h4");
   twoStepTitle.style.margin = "16px 0 8px";
@@ -1658,7 +1699,7 @@ async function initSupabase() {
 
   authPolicy = {
     passwordMinLength: config?.auth?.passwordMinLength || 8,
-    requireEmailConfirmation: config?.auth?.requireEmailConfirmation !== false,
+    requireEmailConfirmation: false,
     redirectUrl: config?.auth?.redirectUrl || window.location.origin,
     requiredProfileFields: config?.auth?.requiredProfileFields || ["full_name", "date_of_birth", "headline", "bio"],
     twoStepOptions: config?.auth?.twoStepOptions || ["email", "authenticator_app"],
@@ -1721,7 +1762,7 @@ function formatAuthError(error, context = "sign-in") {
   if (!raw) return `Unable to complete ${context}. Please try again.`;
 
   if (normalized.includes("invalid login credentials")) {
-    return "Invalid email or password. If you just signed up, confirm your email first, then try again.";
+    return "Invalid email or password. Try Google sign-in if that account was created with a Google provider.";
   }
 
   if (normalized.includes("email rate limit exceeded") || normalized.includes("security purposes")) {
@@ -1763,6 +1804,35 @@ function setAuthRequestBusy(isBusy) {
   if (signInBtn) signInBtn.disabled = isBusy;
   if (signUpBtn) signUpBtn.disabled = isBusy;
   if (resetPasswordBtn) resetPasswordBtn.disabled = isBusy;
+  if (googleAuthBtn) googleAuthBtn.disabled = isBusy;
+}
+
+async function startGoogleAuth(linkMode = false) {
+  if (!supabaseClient) throw new Error("Supabase not configured.");
+
+  const emailHint = authEmail?.value?.trim();
+  const queryParams = { prompt: "select_account" };
+  if (emailHint) {
+    queryParams.login_hint = emailHint;
+  }
+
+  const options = {
+    redirectTo: authPolicy.redirectUrl,
+    queryParams
+  };
+
+  const response = linkMode
+    ? await supabaseClient.auth.linkIdentity({ provider: "google", options })
+    : await supabaseClient.auth.signInWithOAuth({ provider: "google", options });
+
+  if (response.error) throw response.error;
+
+  if (response.data?.url) {
+    window.location.assign(response.data.url);
+    return;
+  }
+
+  showMessage(linkMode ? "Linking your Google account..." : "Redirecting to Google...");
 }
 
 function startSignupCooldown(email, durationMs = 10 * 60 * 1000) {
@@ -1797,7 +1867,7 @@ async function renderDeleteAccountSection() {
   phraseInput.placeholder = "DELETE MY ACCOUNT";
 
   const emailLabel = document.createElement("label");
-  emailLabel.textContent = "Confirm your email";
+  emailLabel.textContent = "Re-enter account email";
   const emailInput = document.createElement("input");
   emailInput.type = "email";
   emailInput.value = currentUser?.email || "";
@@ -2245,20 +2315,12 @@ signUpBtn.addEventListener("click", async () => {
     });
 
     if (error) throw error;
-    const successMessage = authPolicy.requireEmailConfirmation
-      ? "Sign up successful. Check your inbox to confirm your email."
-      : "Sign up successful.";
+    const successMessage = "Account created successfully.";
     showMessage(successMessage);
     setAuthFeedback(successMessage, false);
     authPassword.value = "";
-    if (authPolicy.requireEmailConfirmation) {
-      startSignupCooldown(email);
-      setAuthMode("signin");
-      authPolicyHint.textContent = "Your account was created. Confirm your email, then sign in with the same address.";
-    }
-    if (!authPolicy.requireEmailConfirmation) {
-      setAuthModalOpen(false);
-    }
+    setAuthMode("signin");
+    setAuthModalOpen(false);
   } catch (error) {
     const message = formatAuthError(error, "sign-up");
     if (/rate limit|too many attempts|security purposes/i.test(message) || /rate limit|too many attempts|security purposes/i.test(String(error?.message || ""))) {
@@ -2358,6 +2420,23 @@ authModeSignUp.addEventListener("click", () => {
   setAuthMode("signup");
   setAuthFeedback("");
 });
+
+if (googleAuthBtn) {
+  googleAuthBtn.addEventListener("click", async () => {
+    if (authRequestInFlight) return;
+    setAuthRequestBusy(true);
+
+    try {
+      await startGoogleAuth(false);
+    } catch (error) {
+      const message = formatAuthError(error, authMode === "signup" ? "sign-up" : "sign-in");
+      showMessage(message, true);
+      setAuthFeedback(message, true);
+    } finally {
+      setAuthRequestBusy(false);
+    }
+  });
+}
 
 openAuthModal.addEventListener("click", () => {
   setProfileMenuOpen(false);

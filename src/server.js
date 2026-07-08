@@ -158,7 +158,7 @@ app.get("/api/config", (_req, res) => {
     ...getPublicSupabaseConfig(),
     auth: {
       passwordMinLength: Number(process.env.AUTH_PASSWORD_MIN_LENGTH || 8),
-      requireEmailConfirmation: String(process.env.AUTH_REQUIRE_EMAIL_CONFIRMATION || "true") === "true",
+      requireEmailConfirmation: false,
       redirectUrl: process.env.SUPABASE_REDIRECT_URL || "http://localhost:3000",
       termsVersion: process.env.AUTH_TERMS_VERSION || "2026-03-11",
       requiredProfileFields: ["full_name", "date_of_birth", "headline", "bio"],
