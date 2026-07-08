@@ -5,19 +5,9 @@
   --accent: #0a7f5a;
   --muted: #5d5f6b;
   --line: #d9d3c4;
-  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-emphasis: cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-fast: 160ms var(--ease-smooth);
-  --transition-base: 240ms var(--ease-smooth);
-  --transition-slow: 420ms var(--ease-emphasis);
 }
 
 * {
-  box-sizing: border-box;
-}
-
-*::before,
-*::after {
   box-sizing: border-box;
 }
 
@@ -31,7 +21,6 @@ body {
 
 html {
   overflow-x: hidden;
-  scroll-behavior: smooth;
 }
 
 body.splash-active {
@@ -49,7 +38,7 @@ body.splash-active {
 }
 
 .startup-splash.fade-out {
-  animation: splashFade 650ms var(--ease-emphasis) forwards;
+  animation: splashFade 500ms ease forwards;
 }
 
 .startup-splash-inner {
@@ -98,7 +87,6 @@ body.splash-active {
   border-radius: 16px;
   padding: 20px 24px;
   box-shadow: 0 10px 32px rgb(0 0 0 / 0.12);
-  animation: floatIn 520ms var(--ease-emphasis) both;
 }
 
 .loader-ring {
@@ -117,7 +105,6 @@ body.splash-active {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  animation: pageFadeUp 560ms var(--ease-emphasis) both;
 }
 
 .site-header {
@@ -126,7 +113,6 @@ body.splash-active {
   align-items: center;
   gap: 16px;
   padding: 10px 0 20px;
-  transition: transform var(--transition-base), opacity var(--transition-base), background-color var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base);
 }
 
 .header-note {
@@ -179,7 +165,7 @@ body.splash-active {
   max-width: min(360px, calc(100vw - 24px));
   transform: translateY(10px);
   opacity: 0;
-  transition: transform var(--transition-fast), opacity var(--transition-fast);
+  transition: transform 180ms ease, opacity 180ms ease;
 }
 
 .auth-toast.is-visible {
@@ -193,7 +179,6 @@ body.splash-active {
   border-radius: 14px;
   box-shadow: 0 10px 28px rgb(0 0 0 / 0.14);
   padding: 12px;
-  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
 }
 
 .auth-toast-content p {
@@ -245,12 +230,6 @@ body.splash-active {
   box-shadow: 0 20px 60px rgb(15 23 42 / 0.16);
 }
 
-.auth-modal:not([hidden]) .auth-dialog,
-.profile-panel:not([hidden]) .profile-dialog,
-.auth-modal:not([hidden]) .profile-dialog {
-  animation: sheetIn 420ms var(--ease-emphasis) both;
-}
-
 .profile-dialog {
   position: relative;
   z-index: 1;
@@ -259,7 +238,6 @@ body.splash-active {
   max-height: calc(100vh - 32px);
   overflow-y: auto;
   overscroll-behavior: contain;
-  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
 }
 
 .profile-grid {
@@ -292,7 +270,6 @@ body.splash-active {
   background: #fff;
   padding: 18px;
   min-height: 320px;
-  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base), background-color var(--transition-base);
 }
 
 .profile-settings-form {
@@ -407,7 +384,6 @@ body.splash-active {
   padding: 8px;
   display: grid;
   gap: 6px;
-  transition: transform var(--transition-base), opacity var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
 }
 
 .profile-menu-item,
@@ -422,7 +398,6 @@ body.splash-active {
   font: inherit;
   text-decoration: none;
   cursor: pointer;
-  transition: background-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
 }
 
 .profile-menu-item:hover,
@@ -467,7 +442,6 @@ body.splash-active {
   font-weight: 700;
   color: var(--muted);
   background: transparent;
-  transition: background-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .auth-mode-btn.is-active {
@@ -2027,7 +2001,7 @@ body::after {
 }
 
 .launch-button {
-  background: linear-gradient(120deg, var(--accent), #1e9c71) !important;
+  background: linear-gradient(135deg, #00d4ff 0%, #8a2be2 52%, #ff007f 100%) !important;
   color: #fff !important;
   border: 0 !important;
   box-shadow: 0 18px 34px rgb(138 43 226 / 0.28) !important;
@@ -2712,142 +2686,6 @@ body::after {
   margin-top: auto;
 }
 
-.auth-modal .floating-label input,
-.auth-modal .floating-label textarea,
-input,
-textarea {
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast), transform var(--transition-fast);
-}
-
-button,
-.btn-primary,
-.btn-soft,
-.btn-outline,
-.btn-danger,
-.btn-text,
-.landing-tab,
-.profile-nav-item,
-.profile-link,
-.profile-menu-item,
-.profile-menu-link,
-.step-dot,
-.feature-item,
-.auth-choice-option,
-.auth-check-row,
-.summary-card,
-.result-card,
-.profile-block,
-.auth-status-card,
-.panel,
-.hero,
-.site-header,
-.loading-box,
-.auth-toast-content {
-  transition: transform var(--transition-base), box-shadow var(--transition-base), background-color var(--transition-base), border-color var(--transition-base), color var(--transition-fast), opacity var(--transition-fast);
-}
-
-button:hover,
-.btn-primary:hover,
-.btn-soft:hover,
-.btn-outline:hover,
-.btn-danger:hover,
-.btn-text:hover,
-.landing-tab:hover,
-.profile-nav-item:hover,
-.profile-link:hover,
-.profile-menu-item:hover,
-.profile-menu-link:hover,
-.step-dot:hover,
-.feature-item:hover,
-.auth-choice-option:hover,
-.auth-check-row:hover,
-.summary-card:hover,
-.result-card:hover,
-.profile-block:hover,
-.auth-status-card:hover,
-.panel:hover,
-.hero:hover,
-.site-header:hover,
-.loading-box:hover,
-.auth-toast-content:hover {
-  transform: translateY(-1px);
-}
-
-button:active,
-.btn-primary:active,
-.btn-soft:active,
-.btn-outline:active,
-.btn-danger:active,
-.btn-text:active,
-.landing-tab:active,
-.profile-nav-item:active,
-.profile-link:active,
-.profile-menu-item:active,
-.profile-menu-link:active {
-  transform: translateY(0);
-}
-
-button:focus-visible,
-.btn-primary:focus-visible,
-.btn-soft:focus-visible,
-.btn-outline:focus-visible,
-.btn-danger:focus-visible,
-.btn-text:focus-visible,
-.landing-tab:focus-visible,
-.profile-nav-item:focus-visible,
-.profile-link:focus-visible,
-.profile-menu-item:focus-visible,
-.profile-menu-link:focus-visible,
-input:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent) 72%, white);
-  outline-offset: 2px;
-}
-
-@keyframes pageFadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes floatIn {
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes sheetIn {
-  from {
-    opacity: 0;
-    transform: translateX(-14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
 @media (max-width: 960px) {
   .auth-modal .auth-split-layout {
     grid-template-columns: 1fr;
@@ -2934,13 +2772,9 @@ textarea:focus-visible {
   }
 }
 
-/* Glass UI pass */
+/* Clean UI pass */
 body {
-  background:
-    radial-gradient(circle at 10% 10%, rgb(255 255 255 / 0.74) 0%, transparent 22%),
-    radial-gradient(circle at 85% 18%, rgb(136 255 219 / 0.18) 0%, transparent 20%),
-    radial-gradient(circle at 18% 82%, rgb(255 180 120 / 0.16) 0%, transparent 24%),
-    linear-gradient(135deg, #eef6f4 0%, #f7f5f1 45%, #edf2fb 100%);
+  background: linear-gradient(180deg, #f7f6f2 0%, #f1ede6 100%);
 }
 
 .bg-shape,
@@ -2948,34 +2782,6 @@ body {
 .hero::after,
 .auth-visual-glow {
   display: none !important;
-}
-
-body::before,
-body::after {
-  content: "";
-  position: fixed;
-  inset: auto;
-  pointer-events: none;
-  border-radius: 999px;
-  filter: blur(30px);
-  z-index: -1;
-  opacity: 0.8;
-}
-
-body::before {
-  top: 5%;
-  left: 6%;
-  width: 18rem;
-  height: 18rem;
-  background: radial-gradient(circle, rgb(255 255 255 / 0.55) 0%, transparent 68%);
-}
-
-body::after {
-  bottom: 4%;
-  right: 6%;
-  width: 20rem;
-  height: 20rem;
-  background: radial-gradient(circle, rgb(10 127 90 / 0.18) 0%, transparent 70%);
 }
 
 .container {
@@ -2987,20 +2793,15 @@ body::after {
 .site-header {
   padding: 12px 16px;
   border-radius: 20px;
-  background: rgb(255 255 255 / 0.46);
-  border-color: rgb(255 255 255 / 0.52);
-  box-shadow: 0 20px 50px rgb(15 23 42 / 0.10);
-  backdrop-filter: blur(22px) saturate(180%);
-  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(217, 211, 196, 0.65);
+  box-shadow: 0 8px 24px rgb(15 23 42 / 0.05);
 }
 
 .hero {
   border-radius: 24px;
-  background: linear-gradient(135deg, rgb(255 255 255 / 0.50) 0%, rgb(255 255 255 / 0.26) 100%);
-  border-color: rgb(255 255 255 / 0.46);
-  box-shadow: 0 24px 60px rgb(15 23 42 / 0.10);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 10px 28px rgb(15 23 42 / 0.05);
 }
 
 .hero h1 {
@@ -3015,11 +2816,8 @@ body::after {
 
 .panel {
   border-radius: 22px;
-  background: linear-gradient(135deg, rgb(255 255 255 / 0.62) 0%, rgb(255 255 255 / 0.38) 100%);
-  border-color: rgb(255 255 255 / 0.48);
-  box-shadow: 0 22px 56px rgb(15 23 42 / 0.10);
-  backdrop-filter: blur(22px) saturate(175%);
-  -webkit-backdrop-filter: blur(22px) saturate(175%);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 24px rgb(15 23 42 / 0.05);
 }
 
 .panel h2,
@@ -3037,174 +2835,84 @@ button,
 .btn-primary,
 .btn-soft,
 .btn-outline,
-.btn-danger,
-.btn-text,
-.landing-tab,
-.profile-nav-item,
-.profile-link,
-.profile-menu-item,
-.profile-menu-link {
-  border-radius: 12px;
-}
-
-.btn-primary,
-.btn-soft,
-.btn-outline,
-.btn-danger,
-.btn-text,
-.landing-tab,
-.profile-nav-item,
-.profile-link,
-.profile-menu-item,
-.profile-menu-link,
-.summary-card,
-.result-card,
-.profile-content,
-.profile-block,
-.auth-status-card,
-.auth-toast-content,
-.loading-box,
-.profile-menu,
-.auth-choice-option,
-.auth-check-row,
-.site-header,
-.hero,
-.panel,
-.auth-dialog,
-.profile-dialog {
-  border: 1px solid rgb(255 255 255 / 0.40);
-  box-shadow: 0 18px 42px rgb(15 23 42 / 0.08);
-  backdrop-filter: blur(20px) saturate(175%);
-  -webkit-backdrop-filter: blur(20px) saturate(175%);
+.btn-danger {
+  border-radius: 11px;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, rgb(10 127 90 / 0.92) 0%, rgb(30 156 113 / 0.88) 100%);
+  background: #0a7f5a;
+  box-shadow: none;
+}
+
+.btn-primary:hover {
+  background: #086a4d;
 }
 
 .btn-soft {
-  background: rgb(238 245 241 / 0.70);
-  border-color: rgb(215 226 220 / 0.92);
+  background: #eef3f1;
+  border-color: #d7e2dc;
   color: #12352a;
 }
 
-.btn-outline,
-.btn-text,
-.landing-tab,
-.profile-nav-item,
-.profile-link,
-.profile-menu-item,
-.profile-menu-link {
-  background: rgb(255 255 255 / 0.46);
+.btn-soft:hover {
+  background: #e6efea;
+}
+
+.btn-outline {
+  background: #fff;
+  border-color: #d7ddd8;
+}
+
+.btn-outline:hover {
+  background: #f8faf9;
 }
 
 .btn-danger {
-  background: rgb(255 245 245 / 0.72);
-  border-color: rgb(240 206 206 / 0.92);
+  background: #fff8f8;
+  border-color: #f0cece;
 }
 
 .result-card,
 .summary-card,
 .profile-content,
 .profile-block,
-.auth-status-card,
-.auth-toast-content,
-.loading-box,
-.profile-menu,
-.auth-choice-option,
-.auth-check-row {
-  background: linear-gradient(135deg, rgb(255 255 255 / 0.62) 0%, rgb(255 255 255 / 0.36) 100%);
+.auth-status-card {
+  background: #fff;
+  border-color: #dde3de;
+  box-shadow: none;
 }
 
 .auth-dialog,
 .profile-dialog {
-  background: linear-gradient(135deg, rgb(255 255 255 / 0.56) 0%, rgb(255 255 255 / 0.30) 100%);
-  box-shadow: 0 28px 70px rgb(15 23 42 / 0.16);
+  box-shadow: 0 16px 48px rgb(15 23 42 / 0.12);
 }
 
-.auth-modal .auth-dialog,
-.auth-modal .profile-dialog {
-  background: linear-gradient(135deg, rgb(255 255 255 / 0.60) 0%, rgb(255 255 255 / 0.30) 100%);
+.auth-modal .auth-dialog {
+  background: #fff;
 }
 
 .auth-modal .auth-form-side {
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.40) 0%, rgb(248 250 252 / 0.72) 100%);
+  background: #fff;
   min-height: 0;
 }
 
 .auth-modal .auth-mode-switch {
-  background: rgb(255 255 255 / 0.42);
-  border: 1px solid rgb(255 255 255 / 0.42);
-  backdrop-filter: blur(18px) saturate(170%);
-  -webkit-backdrop-filter: blur(18px) saturate(170%);
+  background: #f4f7f5;
 }
 
 .auth-modal .auth-mode-btn.is-active {
-  background: rgb(255 255 255 / 0.82);
-  box-shadow: 0 10px 20px rgb(15 23 42 / 0.08);
+  box-shadow: none;
 }
 
-.auth-modal .floating-label input,
-.auth-modal .floating-label textarea,
-input,
-textarea {
-  background: rgb(255 255 255 / 0.62);
-  border-color: rgb(255 255 255 / 0.52);
-}
-
-.auth-modal .floating-label input:focus,
-.auth-modal .floating-label textarea:focus,
-input:focus,
-textarea:focus {
-  background: rgb(255 255 255 / 0.88);
-}
-
-.auth-modal .auth-main-btn:first-child,
-.auth-modal .auth-main-btn:last-child {
-  background: linear-gradient(135deg, rgb(10 127 90 / 0.96) 0%, rgb(7 104 76 / 0.94) 100%);
-}
-
-.auth-modal.is-authenticated .auth-form-side {
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.50) 0%, rgb(248 250 252 / 0.74) 100%);
-}
-
-.profile-menu-item:hover,
-.profile-menu-link:hover,
-.profile-nav-item:hover,
-.profile-link:hover,
-.landing-tab:hover {
-  background: rgb(255 255 255 / 0.76);
-}
-
-.panel:hover,
-.hero:hover,
-.site-header:hover,
-.result-card:hover,
-.summary-card:hover,
-.profile-block:hover,
-.auth-status-card:hover {
-  box-shadow: 0 26px 64px rgb(15 23 42 / 0.14);
+.profile-menu,
+.auth-toast-content,
+.loading-box {
+  box-shadow: 0 10px 30px rgb(15 23 42 / 0.1);
 }
 
 @media (max-width: 540px) {
   .container {
     width: calc(100vw - 14px);
-  }
-
-  body::before,
-  body::after {
-    width: 12rem;
-    height: 12rem;
-    filter: blur(24px);
-  }
-
-  .hero,
-  .panel,
-  .site-header,
-  .auth-dialog,
-  .profile-dialog {
-    backdrop-filter: blur(18px) saturate(170%);
-    -webkit-backdrop-filter: blur(18px) saturate(170%);
   }
 
   .hero,
