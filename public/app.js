@@ -167,6 +167,8 @@ let currentUser = null;
 let activeProfileTab = "general";
 let authToastTimer = null;
 let authMode = "signin";
+let authRequestInFlight = false;
+let signupCooldown = { email: "", until: 0 };
 const AUTH_FIELD_LABELS = {
   full_name: "full name",
   date_of_birth: "date of birth",
@@ -1723,7 +1725,15 @@ function formatAuthError(error, context = "sign-in") {
   }
 
   if (normalized.includes("email rate limit exceeded") || normalized.includes("security purposes")) {
-    return "Too many attempts in a short time. Wait a moment, then try again or reset your password.";
+    if (context === "sign-up") {
+      return "Too many sign-up attempts in a short time. Wait a moment, then try again.";
+    }
+
+    if (context === "password reset") {
+      return "Too many password reset attempts in a short time. Wait a moment, then try again.";
+    }
+
+    return "Too many attempts in a short time. Wait a moment, then try again.";
   }
 
   if (normalized.includes("user already registered")) {
@@ -1743,6 +1753,28 @@ function formatAuthError(error, context = "sign-in") {
   }
 
   return raw;
+}
+
+function setAuthRequestBusy(isBusy) {
+  authRequestInFlight = isBusy;
+
+  if (currentUser) return;
+
+  if (signInBtn) signInBtn.disabled = isBusy;
+  if (signUpBtn) signUpBtn.disabled = isBusy;
+  if (resetPasswordBtn) resetPasswordBtn.disabled = isBusy;
+}
+
+function startSignupCooldown(email, durationMs = 10 * 60 * 1000) {
+  signupCooldown = {
+    email: String(email || "").trim().toLowerCase(),
+    until: Date.now() + durationMs
+  };
+}
+
+function isSignupCooldownActive(email) {
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  return !!signupCooldown.email && signupCooldown.email === normalizedEmail && Date.now() < signupCooldown.until;
 }
 
 async function renderDeleteAccountSection() {
@@ -2161,6 +2193,9 @@ if (deployVercelBtn) {
 }
 
 signUpBtn.addEventListener("click", async () => {
+  if (authRequestInFlight) return;
+  setAuthRequestBusy(true);
+
   try {
     setAuthFeedback("");
     if (!supabaseClient) throw new Error("Supabase not configured.");
@@ -2168,6 +2203,15 @@ signUpBtn.addEventListener("click", async () => {
     const password = authPassword.value.trim();
     const signupProfile = readSignUpProfileInputs();
     assertCredentials(email, password, true);
+
+    if (isSignupCooldownActive(email)) {
+      setAuthMode("signin");
+      const cooldownMessage = "That email is cooling down from a recent sign-up attempt. Wait a few minutes, then sign in or try a different email.";
+      showMessage(cooldownMessage, true);
+      setAuthFeedback(cooldownMessage, true);
+      return;
+    }
+
     const passwordError = validatePasswordStrength(password, authPolicy.passwordMinLength);
     if (passwordError) {
       throw new Error(passwordError);
@@ -2206,17 +2250,32 @@ signUpBtn.addEventListener("click", async () => {
       : "Sign up successful.";
     showMessage(successMessage);
     setAuthFeedback(successMessage, false);
+    authPassword.value = "";
+    if (authPolicy.requireEmailConfirmation) {
+      startSignupCooldown(email);
+      setAuthMode("signin");
+      authPolicyHint.textContent = "Your account was created. Confirm your email, then sign in with the same address.";
+    }
     if (!authPolicy.requireEmailConfirmation) {
       setAuthModalOpen(false);
     }
   } catch (error) {
     const message = formatAuthError(error, "sign-up");
+    if (/rate limit|too many attempts|security purposes/i.test(message) || /rate limit|too many attempts|security purposes/i.test(String(error?.message || ""))) {
+      startSignupCooldown(authEmail.value.trim());
+      setAuthMode("signin");
+    }
     showMessage(message, true);
     setAuthFeedback(message, true);
+  } finally {
+    setAuthRequestBusy(false);
   }
 });
 
 signInBtn.addEventListener("click", async () => {
+  if (authRequestInFlight) return;
+  setAuthRequestBusy(true);
+
   try {
     setAuthFeedback("");
     if (!supabaseClient) throw new Error("Supabase not configured.");
@@ -2232,6 +2291,8 @@ signInBtn.addEventListener("click", async () => {
     const message = formatAuthError(error, "sign-in");
     showMessage(message, true);
     setAuthFeedback(message, true);
+  } finally {
+    setAuthRequestBusy(false);
   }
 });
 
@@ -2250,6 +2311,9 @@ signOutBtn.addEventListener("click", async () => {
 });
 
 resetPasswordBtn.addEventListener("click", async () => {
+  if (authRequestInFlight) return;
+  setAuthRequestBusy(true);
+
   try {
     setAuthFeedback("");
     if (!supabaseClient) throw new Error("Supabase not configured.");
@@ -2267,6 +2331,8 @@ resetPasswordBtn.addEventListener("click", async () => {
     const message = formatAuthError(error, "password reset");
     showMessage(message, true);
     setAuthFeedback(message, true);
+  } finally {
+    setAuthRequestBusy(false);
   }
 });
 
