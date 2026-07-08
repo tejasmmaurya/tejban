@@ -482,6 +482,25 @@ function setAuthMode(mode) {
   authMode = mode === "signup" ? "signup" : "signin";
   const signInMode = authMode === "signin";
 
+  if (currentUser) {
+    const displayName = currentUser.user_metadata?.full_name || currentUser.email.split("@")[0];
+    authModal.classList.add("is-authenticated");
+    authModal.classList.remove("is-signin", "is-signup");
+    authModeSignIn.classList.remove("is-active");
+    authModeSignIn.setAttribute("aria-selected", "false");
+    authModeSignUp.classList.remove("is-active");
+    authModeSignUp.setAttribute("aria-selected", "false");
+
+    authSignupSection.hidden = true;
+    signInBtn.hidden = true;
+    signUpBtn.hidden = true;
+    resetPasswordBtn.hidden = true;
+    signOutBtn.hidden = false;
+    authPolicyHint.textContent = `You are signed in as ${displayName}. Use Sign Out to switch accounts.`;
+    return;
+  }
+
+  authModal.classList.remove("is-authenticated");
   authModal.classList.toggle("is-signin", signInMode);
   authModal.classList.toggle("is-signup", !signInMode);
 
@@ -520,6 +539,21 @@ function syncAuthButtons(user) {
   openAuthModal.hidden = !!user;
   profileAvatarButton.hidden = !user;
   setHeaderAvatar(user);
+
+  if (user) {
+    const displayName = user.user_metadata?.full_name || user.email.split("@")[0];
+    authModal.classList.add("is-authenticated");
+    authSignupSection.hidden = true;
+    signInBtn.hidden = true;
+    signUpBtn.hidden = true;
+    resetPasswordBtn.hidden = true;
+    signOutBtn.hidden = false;
+    authPolicyHint.textContent = `You are signed in as ${displayName}. Use Sign Out to switch accounts.`;
+    return;
+  }
+
+  authModal.classList.remove("is-authenticated");
+  setAuthMode(authMode);
 }
 
 function renderProfileSection(sectionKey) {
