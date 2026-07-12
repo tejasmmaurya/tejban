@@ -156,10 +156,11 @@ let lastIdeaInput = null;
 let currentLandingCode = null;
 let supabaseClient = null;
 let deployConfig = { hasNetlifyDeployHook: false, hasVercelDeployHook: false };
+const AUTH_REDIRECT_URL = window.location.origin;
 let authPolicy = {
   passwordMinLength: 8,
   requireEmailConfirmation: false,
-  redirectUrl: window.location.origin,
+  redirectUrl: AUTH_REDIRECT_URL,
   requiredProfileFields: ["full_name", "date_of_birth", "headline", "bio"],
   twoStepOptions: ["email", "authenticator_app"],
   termsVersion: "2026-03-11"
@@ -1700,7 +1701,7 @@ async function initSupabase() {
   authPolicy = {
     passwordMinLength: config?.auth?.passwordMinLength || 8,
     requireEmailConfirmation: false,
-    redirectUrl: config?.auth?.redirectUrl || window.location.origin,
+    redirectUrl: AUTH_REDIRECT_URL,
     requiredProfileFields: config?.auth?.requiredProfileFields || ["full_name", "date_of_birth", "headline", "bio"],
     twoStepOptions: config?.auth?.twoStepOptions || ["email", "authenticator_app"],
     termsVersion: config?.auth?.termsVersion || "2026-03-11"

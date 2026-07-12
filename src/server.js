@@ -209,32 +209,43 @@ app.post("/api/generate-landing-code", async (req, res) => {
   }
 });
 
-app.post("/api/chat", async (req, res) => {
-  const { message, context } = req.body;
-  if (!message) return res.status(400).json({ error: "Message is required" });
+// server.js or routes/chat.js
+// server.js or routes/chat.js
+app.post('/api/chat', async (req, res) => {
+    try {
+        const { message, businessContext } = req.body;
 
-  try {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) return res.status(500).json({ error: "API key is missing" });
+        // Catch missing content body constraints gracefully
+        if (!message) {
+            return res.status(400).json({ error: "Message content cannot be blank" });
+        }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+        const model = googleGenAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+        
+        const result = await model.generateContent([
+            `You are Tejas, an expert business assistant. Context: ${JSON.stringify(businessContext || {})}`,
+            message
+        ]);
 
-    let systemInstruction = "Your name is Tejas. You are an expert AI Co-Founder and business advisor for the user's startup. You MUST answer concisely and professionally.";
-    if (context && context.startupIdea) {
-      systemInstruction += `\n\nContext about the user's current startup idea:\nIdea: ${context.startupIdea}\nTarget Users: ${context.targetUsers}\nIndustry: ${context.industry}\nBudget: ${context.budget}`;
-    } else {
-      systemInstruction += "\n\nThe user hasn't generated a startup blueprint yet. Help them brainstorm from scratch.";
+        // Defensive property lookup
+        let replyText = "";
+        if (result && result.response) {
+            replyText = typeof result.response.text === 'function' ? result.response.text() : result.response.text;
+        }
+
+        // Return standard response matrix
+        return res.json({ reply: replyText || "I couldn't process that response format." });
+
+    } catch (error) {
+        // Detailed server logging to isolate the bug
+        console.error("🔴 CHAT ROUTE CRASH DETECTED:", error.stack || error);
+        
+        // Prevents a raw 500 HTML block response, giving the frontend clean error data instead
+        return res.status(500).json({ 
+            error: "Internal Server Error", 
+            reply: "Tejas encountered an internal error. Please check your terminal console logs." 
+        });
     }
-
-    const prompt = `${systemInstruction}\n\nUser: ${message}\nTejas:`;
-    
-    const result = await model.generateContent(prompt);
-    return res.json({ reply: result.response.text() });
-  } catch (error) {
-    console.error("Chat error:", error);
-    return res.status(500).json({ error: "Failed to process chat message" });
-  }
 });
 
 app.post("/api/generate-landing-code", async (req, res) => {
